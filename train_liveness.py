@@ -13,6 +13,7 @@ from sklearn.metrics import classification_report
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.utils import to_categorical
+from tensorflow import lite
 from imutils import paths
 import matplotlib.pyplot as plt
 import numpy as np
@@ -100,6 +101,14 @@ print(classification_report(testY.argmax(axis=1),
 # save the network to disk
 print("[INFO] serializing network to '{}'...".format(args["model"]))
 model.save(args["model"], save_format="h5")
+
+# Convert model to tflite
+converter = lite.TFLiteConverter.from_keras_model(model)
+tflite_model = converter.convert()
+
+# Save the tflite model.
+with open('model.tflite', 'wb') as f:
+  f.write(tflite_model)
 
 # save the label encoder to disk
 f = open(args["le"], "wb")
